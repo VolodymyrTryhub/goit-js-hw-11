@@ -18,7 +18,7 @@ function handleSubmit(event) {
 
   const query = event.target.elements['search-text'].value.trim();
 
-  if (query === '') {
+  if (!query) {
     iziToast.warning({
       message: 'Please enter a search word!',
     });
@@ -42,6 +42,10 @@ function handleSubmit(event) {
     })
     .catch(error => {
       console.log(error);
+
+      iziToast.error({
+        message: 'Something went wrong. Please try again later!',
+      });
     })
     .finally(() => {
       hideLoader();

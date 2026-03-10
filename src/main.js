@@ -1,3 +1,14 @@
+import { getImagesByQuery } from './js/pixabay-api';
+import {
+  createGallery,
+  clearGallery,
+  showLoader,
+  hideLoader,
+} from './js/render-functions';
+
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
 const form = document.querySelector('.form');
 
 form.addEventListener('submit', handleSubmit);
@@ -8,11 +19,33 @@ function handleSubmit(event) {
   const query = event.target.elements['search-text'].value.trim();
 
   if (query === '') {
-    alert('Please enter a search word');
+    iziToast.warning({
+      message: 'Please enter a search word!',
+    });
     return;
   }
 
-  console.log(query);
+  clearGallery();
+  showLoader();
+
+  getImagesByQuery(query)
+    .then(data => {
+      if (data.hits.length === 0) {
+        iziToast.error({
+          message:
+            'Sorry, there are no images matching your search query. Please try again!',
+        });
+        return;
+      }
+
+      createGallery(data.hits);
+    })
+    .catch(error => {
+      console.log(error);
+    })
+    .finally(() => {
+      hideLoader();
+    });
 
   event.target.reset();
 }
